@@ -23,3 +23,19 @@
 - 并发数多测试几个场景，比如并发客户端为500、1000、2000、5000、10000的场景。rpc client对象池要小于并发客户端数，用来测试客户端内部可以共享rpc client的场景。
 - 耗时太大的情况下比较吞吐率是没有意义的。没有实际业务会在服务几乎不可用的情况下还谈论吞吐率。
 - 请求错误数太多的情况下指标是没有意义的。例如所有的请求都返回错误，耗时可能很低，但这是无意义的。
+
+
+## RPC 框架
+
+测试的RPC框架包括:
+
+- [rpcx](https://github.com/rpcxio/rpcx-benchmark/tree/master/rpcx)
+- [grpc/go](https://github.com/rpcxio/rpcx-benchmark/tree/master/grpc)
+- [Go标准库的rpc](https://github.com/rpcxio/rpcx-benchmark/tree/master/go_stdrpc)
+- [tarsgo](): todo
+- [thrift](): todo
+- [dubbo-go](): todo
+- [hprose](): todo
+- [go-micro](): toto
+
+欢迎补充`todo`的代码，欢迎提交其它rpc框架的测试代码。

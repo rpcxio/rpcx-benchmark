@@ -1,26 +1,25 @@
 package main
 
 import (
-	"context"
 	"flag"
-	"strings"
+	"net"
+	_ "net/http/pprof"
+	"net/rpc"
 	"sync"
 	"sync/atomic"
 	"time"
 
-	benchmark "github.com/rpcxio/rpcx-benchmark"
-
 	"github.com/juju/ratelimit"
+	codec "github.com/mars9/codec"
+	benchmark "github.com/rpcxio/rpcx-benchmark"
 	"github.com/rpcxio/rpcx-benchmark/proto"
-	"github.com/smallnest/rpcx/client"
 	"github.com/smallnest/rpcx/log"
-	"github.com/smallnest/rpcx/protocol"
 )
 
 var concurrency = flag.Int("c", 1, "concurrency")
-var total = flag.Int("n", 10000, "total requests for all clients")
+var total = flag.Int("n", 1, "total requests for all clients")
 var host = flag.String("s", "127.0.0.1:8972", "server ip and port")
-var pool = flag.Int("pool", 10, "shared rpcx clients")
+var pool = flag.Int("pool", 10, " shared grpc clients")
 var rate = flag.Int("r", 10000, "throughputs")
 
 func main() {
@@ -34,18 +33,8 @@ func main() {
 	m := *total / n
 	log.Infof("concurrency: %d\nrequests per client: %d\n\n", n, m)
 
-	// 创建服务端的信息
-	servers := strings.Split(*host, ",")
-	var serverPeers []*client.KVPair
-	for _, server := range servers {
-		serverPeers = append(serverPeers, &client.KVPair{Key: server})
-	}
-	log.Infof("Servers: %+v\n\n", *host)
+	name := "Hello.Say"
 
-	servicePath := "Hello"
-	serviceMethod := "Say"
-
-	// 准备好参数
 	args := proto.PrepareArgs()
 
 	// 参数的大小
@@ -57,29 +46,6 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(n * m)
 
-	// 创建客户端连接池
-	var clientIndex uint64
-	var poolClients = make([]client.XClient, 0, *pool)
-	dis := client.NewMultipleServersDiscovery(serverPeers)
-	for i := 0; i < *pool; i++ {
-		option := client.DefaultOption
-		option.SerializeType = protocol.ProtoBuffer
-		xclient := client.NewXClient(servicePath, client.Failtry, client.RoundRobin, dis, option)
-		defer xclient.Close()
-
-		//warmup
-		var reply proto.BenchmarkMessage
-		for j := 0; j < 5; j++ {
-			xclient.Call(context.Background(), serviceMethod, args, &reply)
-		}
-
-		poolClients = append(poolClients, xclient)
-	}
-
-	// 栅栏，控制客户端同时开始测试
-	var startWg sync.WaitGroup
-	startWg.Add(n + 1) // +1 是因为有一个goroutine用来记录开始时间
-
 	// 总请求数
 	var trans uint64
 	// 返回正常的总请求数
@@ -88,6 +54,29 @@ func main() {
 	// 每个goroutine的耗时记录
 	d := make([][]int64, n, n)
 
+	// 创建客户端连接池
+	var clientIndex uint64
+	var poolClients = make([]*rpc.Client, 0, *pool)
+	for i := 0; i < *pool; i++ {
+		conn, err := net.Dial("tcp", *host)
+		if err != nil {
+			log.Fatal("dialing:", err)
+		}
+		c := codec.NewClientCodec(conn)
+		client := rpc.NewClientWithCodec(c)
+
+		//warmup
+		var reply proto.BenchmarkMessage
+		for j := 0; j < 5; j++ {
+			client.Call(name, args, &reply)
+		}
+		poolClients = append(poolClients, client)
+	}
+
+	// 栅栏，控制客户端同时开始测试
+	var startWg sync.WaitGroup
+	startWg.Add(n + 1) // +1 是因为有一个goroutine用来记录开始时间
+
 	// 创建客户端 goroutine 并进行测试
 	var startTime = time.Now().UnixNano()
 	go func() {
@@ -95,44 +84,42 @@ func main() {
 		startWg.Wait()
 		startTime = time.Now().UnixNano()
 	}()
+
 	for i := 0; i < n; i++ {
 		dt := make([]int64, 0, m)
 		d = append(d, dt)
 
 		go func(i int) {
-
 			var reply proto.BenchmarkMessage
-
 			startWg.Done()
 			startWg.Wait()
 
 			for j := 0; j < m; j++ {
-				// 限流，这里不把限流的时间计算到等待耗时中
 				tb.Wait(1)
 
 				t := time.Now().UnixNano()
 				ci := atomic.AddUint64(&clientIndex, 1)
 				ci = ci % uint64(*pool)
-				xclient := poolClients[int(ci)]
-
-				err := xclient.Call(context.Background(), serviceMethod, args, &reply)
-				t = time.Now().UnixNano() - t // 等待时间+服务时间，等待时间是客户端调度的等待时间以及服务端读取请求、调度的时间，服务时间是请求被服务处理的实际时间
+				client := poolClients[int(ci)]
+				err := client.Call(name, args, &reply)
+				t = time.Now().UnixNano() - t
 
 				d[i] = append(d[i], t)
 
 				if err == nil && reply.Field1 == "OK" {
 					atomic.AddUint64(&transOK, 1)
 				}
+				// if err != nil {
+				// 	log.Error(err)
+				// }
 
 				atomic.AddUint64(&trans, 1)
 				wg.Done()
 			}
-
 		}(i)
 
 	}
 
-	// 等待测试完成
 	wg.Wait()
 
 	// 统计
