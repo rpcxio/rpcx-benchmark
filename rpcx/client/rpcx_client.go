@@ -18,7 +18,7 @@ import (
 )
 
 var concurrency = flag.Int("c", 1, "concurrency")
-var total = flag.Int("n", 1, "total requests for all clients")
+var total = flag.Int("n", 10000, "total requests for all clients")
 var host = flag.String("s", "127.0.0.1:8972", "server ip and port")
 var pool = flag.Int("pool", 10, "shared rpcx clients")
 var rate = flag.Int("r", 10000, "throughputs")
@@ -40,7 +40,7 @@ func main() {
 	for _, server := range servers {
 		serverPeers = append(serverPeers, &client.KVPair{Key: server})
 	}
-	log.Infof("Servers: %+v\n\n", serverPeers)
+	log.Infof("Servers: %+v\n\n", *host)
 
 	servicePath := "Hello"
 	serviceMethod := "Say"
