@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"reflect"
 	"strings"
@@ -9,19 +8,19 @@ import (
 	"sync/atomic"
 	"time"
 
-	benchmark "github.com/rpcxio/rpcx-benchmark"
-
+	"github.com/gogo/protobuf/proto"
 	"github.com/juju/ratelimit"
-	"github.com/rpcx-ecosystem/rpcx-benchmark/proto"
-	"github.com/smallnest/rpcx/client"
+	benchmark "github.com/rpcxio/rpcx-benchmark"
+	"github.com/rpcxio/rpcx-benchmark/grpc/pb"
 	"github.com/smallnest/rpcx/log"
-	"github.com/smallnest/rpcx/protocol"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
 )
 
 var concurrency = flag.Int("c", 1, "concurrency")
 var total = flag.Int("n", 10000, "total requests for all clients")
 var host = flag.String("s", "127.0.0.1:8972", "server ip and port")
-var pool = flag.Int("pool", 10, "shared rpcx clients")
+var pool = flag.Int("pool", 10, " shared grpc clients")
 var rate = flag.Int("r", 10000, "throughputs")
 
 func main() {
@@ -35,51 +34,18 @@ func main() {
 	m := *total / n
 	log.Infof("concurrency: %d\nrequests per client: %d\n\n", n, m)
 
-	// 创建服务端的信息
 	servers := strings.Split(*host, ",")
-	var serverPeers []*client.KVPair
-	for _, server := range servers {
-		serverPeers = append(serverPeers, &client.KVPair{Key: server})
-	}
 	log.Infof("Servers: %+v\n\n", *host)
 
-	servicePath := "Hello"
-	serviceMethod := "Say"
-
-	// 准备好参数
 	args := prepareArgs()
 
-	// 参数的大小
-	b := make([]byte, 1024)
-	i, _ := args.MarshalTo(b)
-	log.Infof("message size: %d bytes\n\n", i)
+	// 请求消息大小
+	b, _ := proto.Marshal(args)
+	log.Infof("message size: %d bytes\n\n", len(b))
 
 	// 等待所有测试完成
 	var wg sync.WaitGroup
 	wg.Add(n * m)
-
-	// 创建客户端连接池
-	var clientIndex uint64
-	var poolClients = make([]client.XClient, 0, *pool)
-	dis := client.NewMultipleServersDiscovery(serverPeers)
-	for i := 0; i < *pool; i++ {
-		option := client.DefaultOption
-		option.SerializeType = protocol.ProtoBuffer
-		xclient := client.NewXClient(servicePath, client.Failtry, client.RoundRobin, dis, option)
-		defer xclient.Close()
-
-		//warmup
-		var reply proto.BenchmarkMessage
-		for j := 0; j < 5; j++ {
-			xclient.Call(context.Background(), serviceMethod, args, &reply)
-		}
-
-		poolClients = append(poolClients, xclient)
-	}
-
-	// 栅栏，控制客户端同时开始测试
-	var startWg sync.WaitGroup
-	startWg.Add(n + 1) // +1 是因为有一个goroutine用来记录开始时间
 
 	// 总请求数
 	var trans uint64
@@ -88,6 +54,26 @@ func main() {
 
 	// 每个goroutine的耗时记录
 	d := make([][]int64, n, n)
+
+	// 创建客户端连接池
+	var clientIndex uint64
+	var poolClients = make([]pb.HelloClient, 0, *pool)
+	for i := 0; i < *pool; i++ {
+		conn, err := grpc.Dial(servers[0], grpc.WithInsecure())
+		if err != nil {
+			log.Fatalf("did not connect: %v", err)
+		}
+		c := pb.NewHelloClient(conn)
+		//warmup
+		for j := 0; j < 5; j++ {
+			c.Say(context.Background(), args)
+		}
+		poolClients = append(poolClients, c)
+	}
+
+	// 栅栏，控制客户端同时开始测试
+	var startWg sync.WaitGroup
+	startWg.Add(n + 1) // +1 是因为有一个goroutine用来记录开始时间
 
 	// 创建客户端 goroutine 并进行测试
 	var startTime = time.Now().UnixNano()
@@ -101,12 +87,6 @@ func main() {
 		d = append(d, dt)
 
 		go func(i int) {
-
-			var reply proto.BenchmarkMessage
-
-			startWg.Done()
-			startWg.Wait()
-
 			for j := 0; j < m; j++ {
 				// 限流，这里不把限流的时间计算到等待耗时中
 				tb.Wait(1)
@@ -114,9 +94,8 @@ func main() {
 				t := time.Now().UnixNano()
 				ci := atomic.AddUint64(&clientIndex, 1)
 				ci = ci % uint64(*pool)
-				xclient := poolClients[int(ci)]
-
-				err := xclient.Call(context.Background(), serviceMethod, args, &reply)
+				c := poolClients[int(ci)]
+				reply, err := c.Say(context.Background(), args)
 				t = time.Now().UnixNano() - t // 等待时间+服务时间，等待时间是客户端调度的等待时间以及服务端读取请求、调度的时间，服务时间是请求被服务处理的实际时间
 
 				d[i] = append(d[i], t)
@@ -133,20 +112,19 @@ func main() {
 
 	}
 
-	// 等待测试完成
 	wg.Wait()
 
 	// 统计
 	benchmark.Stats(startTime, *total, d, trans, transOK)
 }
 
-// 准备请求数据
-func prepareArgs() *proto.BenchmarkMessage {
+func prepareArgs() *pb.BenchmarkMessage {
 	b := true
 	var i int32 = 100000
+	var i64 int64 = 100000
 	var s = "许多往事在眼前一幕一幕，变的那麼模糊"
 
-	var args proto.BenchmarkMessage
+	var args pb.BenchmarkMessage
 
 	v := reflect.ValueOf(&args).Elem()
 	num := v.NumField()
@@ -154,8 +132,10 @@ func prepareArgs() *proto.BenchmarkMessage {
 		field := v.Field(k)
 		if field.Type().Kind() == reflect.Ptr {
 			switch v.Field(k).Type().Elem().Kind() {
-			case reflect.Int, reflect.Int32, reflect.Int64:
+			case reflect.Int, reflect.Int32:
 				field.Set(reflect.ValueOf(&i))
+			case reflect.Int64:
+				field.Set(reflect.ValueOf(&i64))
 			case reflect.Bool:
 				field.Set(reflect.ValueOf(&b))
 			case reflect.String:
