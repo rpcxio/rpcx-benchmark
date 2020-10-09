@@ -26,7 +26,11 @@ func (t *Hello) Say(ctx *arpc.Context) {
 	} else {
 		runtime.Gosched()
 	}
-	ctx.Write(reply)
+	if !*async {
+		ctx.Write(reply)
+	} else {
+		go ctx.Write(reply)
+	}
 }
 
 var (
@@ -34,10 +38,13 @@ var (
 	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 	delay      = flag.Duration("delay", 0, "delay to mock business processing")
 	debugAddr  = flag.String("d", "127.0.0.1:9981", "server ip and port")
+	async      = flag.Bool("a", false, "async response flag")
 )
 
 func main() {
 	flag.Parse()
+
+	log.Println("async response:", *async)
 
 	go func() {
 		log.Println(http.ListenAndServe(*debugAddr, nil))
