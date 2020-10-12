@@ -18,6 +18,11 @@ type Hello int
 func (t *Hello) Say(ctx *arpc.Context) {
 	args := &proto.BenchmarkMessage{}
 	reply := &proto.BenchmarkMessage{}
+
+	if err := ctx.Bind(args); err != nil {
+		ctx.Error(err)
+	}
+
 	args.Field1 = "OK"
 	args.Field2 = 100
 	*reply = *args
