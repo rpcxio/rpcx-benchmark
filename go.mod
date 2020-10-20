@@ -5,7 +5,8 @@ go 1.14
 require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/juju/ratelimit v1.0.1
-	github.com/lesismal/arpc v0.0.0-20201012124237-80ad5cfc3382
+	github.com/lesismal/arpc v0.0.0-20201020140159-7cc18174f381
+	github.com/lesismal/arpcext v0.0.0-20201015173936-8eade3a4c744 // indirect
 	github.com/mars9/codec v0.0.0-20160208102151-49676af5c6e0
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/montanaflynn/stats v0.6.3
