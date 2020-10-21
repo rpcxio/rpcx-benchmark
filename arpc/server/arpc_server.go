@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/lesismal/arpc"
+	alog "github.com/lesismal/arpc/log"
 	"github.com/rpcxio/rpcx-benchmark/arpc/codec"
 	"github.com/rpcxio/rpcx-benchmark/proto"
 )
@@ -31,11 +32,7 @@ func (t *Hello) Say(ctx *arpc.Context) {
 	} else {
 		runtime.Gosched()
 	}
-	if !*async {
-		ctx.Write(reply)
-	} else {
-		go ctx.Write(reply)
-	}
+	ctx.Write(reply)
 }
 
 var (
@@ -49,6 +46,7 @@ var (
 func main() {
 	flag.Parse()
 
+	alog.SetLogLevel(alog.LogLevelNone)
 	log.Println("async response:", *async)
 
 	go func() {
@@ -57,6 +55,6 @@ func main() {
 
 	server := arpc.NewServer()
 	server.Codec = &codec.ProtoBuffer{}
-	server.Handler.Handle("Hello.Say", new(Hello).Say)
+	server.Handler.Handle("Hello.Say", new(Hello).Say, *async)
 	server.Run(*host)
 }

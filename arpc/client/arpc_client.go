@@ -12,6 +12,7 @@ import (
 
 	"github.com/juju/ratelimit"
 	"github.com/lesismal/arpc"
+	alog "github.com/lesismal/arpc/log"
 	"github.com/rpcxio/rpcx-benchmark/arpc/codec"
 	"github.com/rpcxio/rpcx-benchmark/proto"
 	"github.com/smallnest/rpcx/log"
@@ -25,6 +26,8 @@ var rate = flag.Int("r", 10000, "throughputs")
 
 func main() {
 	flag.Parse()
+
+	alog.SetLogLevel(alog.LogLevelNone)
 
 	tb := ratelimit.NewBucket(time.Second/time.Duration(*rate), int64(*rate))
 
@@ -58,7 +61,6 @@ func main() {
 			panic(err)
 		}
 		client.Codec = pbCodec
-		client.Run()
 		defer client.Stop()
 
 		//warmup
