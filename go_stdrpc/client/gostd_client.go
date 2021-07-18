@@ -16,17 +16,21 @@ import (
 	"github.com/smallnest/rpcx/log"
 )
 
-var concurrency = flag.Int("c", 1, "concurrency")
-var total = flag.Int("n", 1, "total requests for all clients")
-var host = flag.String("s", "127.0.0.1:8972", "server ip and port")
-var pool = flag.Int("pool", 10, " shared grpc clients")
-var rate = flag.Int("r", 10000, "throughputs")
+var (
+	concurrency = flag.Int("c", 1, "concurrency")
+	total       = flag.Int("n", 1, "total requests for all clients")
+	host        = flag.String("s", "127.0.0.1:8972", "server ip and port")
+	pool        = flag.Int("pool", 10, " shared grpc clients")
+	rate        = flag.Int("r", 0, "throughputs")
+)
 
 func main() {
 	flag.Parse()
 
-	tb := ratelimit.NewBucket(time.Second/time.Duration(*rate), int64(*rate))
-
+	var rl ratelimit.Limiter
+	if *rate > 0 {
+		rl = ratelimit.New(*rate)
+	}
 	// 并发goroutine数.模拟客户端
 	n := *concurrency
 	// 每个客户端需要发送的请求数
@@ -56,7 +60,7 @@ func main() {
 
 	// 创建客户端连接池
 	var clientIndex uint64
-	var poolClients = make([]*rpc.Client, 0, *pool)
+	poolClients := make([]*rpc.Client, 0, *pool)
 	for i := 0; i < *pool; i++ {
 		conn, err := net.Dial("tcp", *host)
 		if err != nil {
@@ -65,7 +69,7 @@ func main() {
 		c := codec.NewClientCodec(conn)
 		client := rpc.NewClientWithCodec(c)
 
-		//warmup
+		// warmup
 		var reply proto.BenchmarkMessage
 		for j := 0; j < 5; j++ {
 			client.Call(name, args, &reply)
@@ -78,7 +82,7 @@ func main() {
 	startWg.Add(n + 1) // +1 是因为有一个goroutine用来记录开始时间
 
 	// 创建客户端 goroutine 并进行测试
-	var startTime = time.Now().UnixNano()
+	startTime := time.Now().UnixNano()
 	go func() {
 		startWg.Done()
 		startWg.Wait()
@@ -95,7 +99,10 @@ func main() {
 			startWg.Wait()
 
 			for j := 0; j < m; j++ {
-				tb.Wait(1)
+				// 限流，这里不把限流的时间计算到等待耗时中
+				if rl != nil {
+					rl.Take()
+				}
 
 				t := time.Now().UnixNano()
 				ci := atomic.AddUint64(&clientIndex, 1)

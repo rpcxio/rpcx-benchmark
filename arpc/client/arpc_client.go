@@ -18,18 +18,23 @@ import (
 	"github.com/smallnest/rpcx/log"
 )
 
-var concurrency = flag.Int("c", 1, "concurrency")
-var total = flag.Int("n", 10000, "total requests for all clients")
-var host = flag.String("s", "127.0.0.1:8972", "server ip and port")
-var pool = flag.Int("pool", 10, "shared rpcx clients")
-var rate = flag.Int("r", 10000, "throughputs")
+var (
+	concurrency = flag.Int("c", 1, "concurrency")
+	total       = flag.Int("n", 10000, "total requests for all clients")
+	host        = flag.String("s", "127.0.0.1:8972", "server ip and port")
+	pool        = flag.Int("pool", 10, "shared rpcx clients")
+	rate        = flag.Int("r", 0, "throughputs")
+)
 
 func main() {
 	flag.Parse()
 
 	alog.SetLogLevel(alog.LogLevelNone)
 
-	tb := ratelimit.NewBucket(time.Second/time.Duration(*rate), int64(*rate))
+	var rl ratelimit.Limiter
+	if *rate > 0 {
+		rl = ratelimit.New(*rate)
+	}
 
 	// 并发goroutine数.模拟客户端
 	n := *concurrency
@@ -51,8 +56,8 @@ func main() {
 
 	// 创建客户端连接池
 	var clientIndex uint64
-	var poolClients = make([]*arpc.Client, 0, *pool)
-	var pbCodec = &codec.ProtoBuffer{}
+	poolClients := make([]*arpc.Client, 0, *pool)
+	pbCodec := &codec.ProtoBuffer{}
 	for i := 0; i < *pool; i++ {
 		client, err := arpc.NewClient(func() (net.Conn, error) {
 			return net.DialTimeout("tcp", *host, time.Second*3)
@@ -63,7 +68,7 @@ func main() {
 		client.Codec = pbCodec
 		defer client.Stop()
 
-		//warmup
+		// warmup
 		var reply proto.BenchmarkMessage
 		for j := 0; j < 5; j++ {
 			// err := client.Call("Hello.Say", args, &reply, arpc.TimeForever)
@@ -86,7 +91,7 @@ func main() {
 	d := make([][]int64, n, n)
 
 	// 创建客户端 goroutine 并进行测试
-	var startTime = time.Now().UnixNano()
+	startTime := time.Now().UnixNano()
 	go func() {
 		startWg.Done()
 		startWg.Wait()
@@ -97,7 +102,6 @@ func main() {
 		d = append(d, dt)
 
 		go func(i int) {
-
 			var reply proto.BenchmarkMessage
 
 			startWg.Done()
@@ -105,7 +109,9 @@ func main() {
 
 			for j := 0; j < m; j++ {
 				// 限流，这里不把限流的时间计算到等待耗时中
-				tb.Wait(1)
+				if rl != nil {
+					rl.Take()
+				}
 
 				t := time.Now().UnixNano()
 				ci := atomic.AddUint64(&clientIndex, 1)
@@ -125,7 +131,6 @@ func main() {
 				atomic.AddUint64(&trans, 1)
 				wg.Done()
 			}
-
 		}(i)
 
 	}

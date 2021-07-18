@@ -17,16 +17,21 @@ import (
 	"google.golang.org/grpc"
 )
 
-var concurrency = flag.Int("c", 1, "concurrency")
-var total = flag.Int("n", 10000, "total requests for all clients")
-var host = flag.String("s", "127.0.0.1:8972", "server ip and port")
-var pool = flag.Int("pool", 10, " shared grpc clients")
-var rate = flag.Int("r", 10000, "throughputs")
+var (
+	concurrency = flag.Int("c", 1, "concurrency")
+	total       = flag.Int("n", 10000, "total requests for all clients")
+	host        = flag.String("s", "127.0.0.1:8972", "server ip and port")
+	pool        = flag.Int("pool", 10, " shared grpc clients")
+	rate        = flag.Int("r", 0, "throughputs")
+)
 
 func main() {
 	flag.Parse()
 
-	tb := ratelimit.NewBucket(time.Second/time.Duration(*rate), int64(*rate))
+	var rl ratelimit.Limiter
+	if *rate > 0 {
+		rl = ratelimit.New(*rate)
+	}
 
 	// 并发goroutine数.模拟客户端
 	n := *concurrency
@@ -57,14 +62,14 @@ func main() {
 
 	// 创建客户端连接池
 	var clientIndex uint64
-	var poolClients = make([]pb.HelloClient, 0, *pool)
+	poolClients := make([]pb.HelloClient, 0, *pool)
 	for i := 0; i < *pool; i++ {
 		conn, err := grpc.Dial(servers[0], grpc.WithInsecure())
 		if err != nil {
 			log.Fatalf("did not connect: %v", err)
 		}
 		c := pb.NewHelloClient(conn)
-		//warmup
+		// warmup
 		for j := 0; j < 5; j++ {
 			c.Say(context.Background(), args)
 		}
@@ -76,7 +81,7 @@ func main() {
 	startWg.Add(n + 1) // +1 是因为有一个goroutine用来记录开始时间
 
 	// 创建客户端 goroutine 并进行测试
-	var startTime = time.Now().UnixNano()
+	startTime := time.Now().UnixNano()
 	go func() {
 		startWg.Done()
 		startWg.Wait()
@@ -89,7 +94,9 @@ func main() {
 		go func(i int) {
 			for j := 0; j < m; j++ {
 				// 限流，这里不把限流的时间计算到等待耗时中
-				tb.Wait(1)
+				if rl != nil {
+					rl.Take()
+				}
 
 				t := time.Now().UnixNano()
 				ci := atomic.AddUint64(&clientIndex, 1)
@@ -107,7 +114,6 @@ func main() {
 				atomic.AddUint64(&trans, 1)
 				wg.Done()
 			}
-
 		}(i)
 
 	}
@@ -122,7 +128,7 @@ func prepareArgs() *pb.BenchmarkMessage {
 	b := true
 	var i int32 = 100000
 	var i64 int64 = 100000
-	var s = "许多往事在眼前一幕一幕，变的那麼模糊"
+	s := "许多往事在眼前一幕一幕，变的那麼模糊"
 
 	var args pb.BenchmarkMessage
 

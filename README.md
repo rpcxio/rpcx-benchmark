@@ -32,6 +32,8 @@
 - [rpcx](https://github.com/rpcxio/rpcx-benchmark/tree/master/rpcx)
 - [grpc/go](https://github.com/rpcxio/rpcx-benchmark/tree/master/grpc)
 - [Go标准库的rpc](https://github.com/rpcxio/rpcx-benchmark/tree/master/go_stdrpc)
+- [kitex](https://github.com/cloudwego/kitex)
+- [arpc](https://github.com/lesismal/arpc)
 - [tarsgo](): todo
 - [thrift](): todo
 - [dubbo-go](): todo
@@ -39,3 +41,48 @@
 - [go-micro](): toto
 
 欢迎补充`todo`的代码，欢迎提交其它rpc框架的测试代码。
+
+## 测试步骤
+
+### 启动server
+
+进入每个rpc框架对应的server文件夹下，运行服务端，你可以指定监听地址
+```
+./xxx_server -s xxx.xxx.xxx.xxx:xxxx
+```
+
+
+### 启动client
+
+```
+./xxx_client -s xxx.xxx.xxx.xxx:xxxx -c 100 -n 1000000
+```
+
+- `-s` 指定服务端地址
+- `-c` 指定并发数. 客户端会启动n个goroutine并发访问
+- `-n` 指定测试的总请求数
+
+另外你还可以指定`-pool`，指定客户端使用几个rpc的client调用。`-r`可以指定测试使用最大的吞吐率，可以用来检验在特定的吞吐率下的延迟情况。
+
+通过设定不同的`-c`，可以统计在不同的并发情况下框架的吞吐和延迟能力。
+
+比如:
+
+```sh
+[root@localhost]#  ./rpcx_client -s 127.0.0.1:8973 -c 2000 -n 1000000
+2021/07/18 16:39:12 rpcx_client.go:39: INFO : concurrency: 2000
+requests per client: 500
+
+2021/07/18 16:39:12 rpcx_client.go:47: INFO : Servers: 127.0.0.1:8973
+
+2021/07/18 16:39:12 rpcx_client.go:58: INFO : message size: 581 bytes
+
+2021/07/18 16:39:17 stats.go:15: INFO : took 4677 ms for 1000000 requests
+2021/07/18 16:39:17 stats.go:36: INFO : sent     requests    : 1000000
+2021/07/18 16:39:17 stats.go:37: INFO : received requests    : 1000000
+2021/07/18 16:39:17 stats.go:38: INFO : received requests_OK : 1000000
+2021/07/18 16:39:17 stats.go:42: INFO : throughput  (TPS)    : 213812
+
+2021/07/18 16:39:17 stats.go:45: INFO : mean: 9188986 ns, median: 7920507 ns, max: 71082749 ns, min: 49247 ns, p99.9: 37877032 ns
+2021/07/18 16:39:17 stats.go:46: INFO : mean: 9 ms, median: 7 ms, max: 71 ms, min: 0 ms, p99.9: 37 ms
+```

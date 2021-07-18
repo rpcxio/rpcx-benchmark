@@ -30,7 +30,7 @@ func Stats(startTime int64, totalRequests int, tookTimes [][]int64, trans, trans
 	median, _ := stats.Median(totalD2)
 	max, _ := stats.Max(totalD2)
 	min, _ := stats.Min(totalD2)
-	p995, _ := stats.Percentile(totalD2, 99.5)
+	p999, _ := stats.Percentile(totalD2, 99.9)
 
 	// 输出结果
 	log.Infof("sent     requests    : %d\n", totalRequests)
@@ -42,7 +42,6 @@ func Stats(startTime int64, totalRequests int, tookTimes [][]int64, trans, trans
 		log.Infof("throughput  (TPS)    : %d\n\n", int64(totalRequests)*1000/totalT)
 	}
 
-	log.Infof("mean: %.f ns, median: %.f ns, max: %.f ns, min: %.f ns, p99.5: %.f ns\n", mean, median, max, min, p995)
-	log.Infof("mean: %d ms, median: %d ms, max: %d ms, min: %d ms, p99.5: %d ms\n", int64(mean/1000000), int64(median/1000000), int64(max/1000000), int64(min/1000000), int64(p995/1000000))
-
+	log.Infof("mean: %.f ns, median: %.f ns, max: %.f ns, min: %.f ns, p99.9: %.f ns\n", mean, median, max, min, p999)
+	log.Infof("mean: %d ms, median: %d ms, max: %d ms, min: %d ms, p99.9: %d ms\n", int64(mean/1000000), int64(median/1000000), int64(max/1000000), int64(min/1000000), int64(p999/1000000))
 }

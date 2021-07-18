@@ -10,11 +10,11 @@ import (
 
 	"github.com/cloudwego/kitex/client"
 	"github.com/gogo/protobuf/proto"
-	"github.com/juju/ratelimit"
 	benchmark "github.com/rpcxio/rpcx-benchmark"
 	"github.com/rpcxio/rpcx-benchmark/kitex/pb"
 	"github.com/rpcxio/rpcx-benchmark/kitex/pb/hello"
 	"github.com/smallnest/rpcx/log"
+	"go.uber.org/ratelimit"
 	"golang.org/x/net/context"
 )
 
@@ -23,13 +23,16 @@ var (
 	total       = flag.Int("n", 10000, "total requests for all clients")
 	host        = flag.String("s", "127.0.0.1:8972", "server ip and port")
 	pool        = flag.Int("pool", 10, " shared kitex clients")
-	rate        = flag.Int("r", 10000, "throughputs")
+	rate        = flag.Int("r", 0, "throughputs")
 )
 
 func main() {
 	flag.Parse()
 
-	tb := ratelimit.NewBucket(time.Second/time.Duration(*rate), int64(*rate))
+	var rl ratelimit.Limiter
+	if *rate > 0 {
+		rl = ratelimit.New(*rate)
+	}
 
 	// 并发goroutine数.模拟客户端
 	n := *concurrency
@@ -88,7 +91,9 @@ func main() {
 		go func(i int) {
 			for j := 0; j < m; j++ {
 				// 限流，这里不把限流的时间计算到等待耗时中
-				tb.Wait(1)
+				if rl != nil {
+					rl.Take()
+				}
 
 				t := time.Now().UnixNano()
 				ci := atomic.AddUint64(&clientIndex, 1)
