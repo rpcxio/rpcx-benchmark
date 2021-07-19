@@ -8,7 +8,6 @@ require (
 	github.com/google/btree v1.0.0 // indirect
 	github.com/grandcat/zeroconf v1.0.0 // indirect
 	github.com/hashicorp/go-msgpack v0.5.5 // indirect
-	github.com/juju/ratelimit v1.0.1
 	github.com/lesismal/arpc v0.0.0-20201020140159-7cc18174f381
 	github.com/mars9/codec v0.0.0-20160208102151-49676af5c6e0
 	github.com/montanaflynn/stats v0.6.3
