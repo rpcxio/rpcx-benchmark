@@ -9,8 +9,8 @@ import (
 	"time"
 
 	benchmark "github.com/rpcxio/rpcx-benchmark"
+	"go.uber.org/ratelimit"
 
-	"github.com/juju/ratelimit"
 	"github.com/lesismal/arpc"
 	alog "github.com/lesismal/arpc/log"
 	"github.com/rpcxio/rpcx-benchmark/arpc/codec"

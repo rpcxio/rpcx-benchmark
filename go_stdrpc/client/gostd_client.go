@@ -9,11 +9,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/juju/ratelimit"
 	codec "github.com/mars9/codec"
 	benchmark "github.com/rpcxio/rpcx-benchmark"
 	"github.com/rpcxio/rpcx-benchmark/proto"
 	"github.com/smallnest/rpcx/log"
+	"go.uber.org/ratelimit"
 )
 
 var (

@@ -62,18 +62,13 @@ func main() {
 	// 每个goroutine的耗时记录
 	d := make([][]int64, n, n)
 
-	// 创建客户端连接池
-	var clientIndex uint64
-	poolClients := make([]hello.Client, 0, *pool)
-	for i := 0; i < *pool; i++ {
-		c := hello.MustNewClient("echo",
-			client.WithHostPorts(servers...),
-			client.WithLongConnection(connpool.IdleConfig{MaxIdlePerAddress: 100, MaxIdleGlobal: 1000, MaxIdleTimeout: time.Minute}))
-		// warmup
-		for j := 0; j < 5; j++ {
-			c.Say(context.Background(), args)
-		}
-		poolClients = append(poolClients, c)
+	// kitex client本身就是pool对象，所以不再单独创建pool
+	client := hello.MustNewClient("echo",
+		client.WithHostPorts(servers...),
+		client.WithLongConnection(connpool.IdleConfig{MaxIdlePerAddress: *pool, MaxIdleGlobal: *pool, MaxIdleTimeout: time.Minute}))
+	// warmup
+	for j := 0; j < 5; j++ {
+		client.Say(context.Background(), args)
 	}
 
 	// 栅栏，控制客户端同时开始测试
@@ -99,10 +94,8 @@ func main() {
 				}
 
 				t := time.Now().UnixNano()
-				ci := atomic.AddUint64(&clientIndex, 1)
-				ci = ci % uint64(*pool)
-				c := poolClients[int(ci)]
-				reply, err := c.Say(context.Background(), args)
+
+				reply, err := client.Say(context.Background(), args)
 				t = time.Now().UnixNano() - t // 等待时间+服务时间，等待时间是客户端调度的等待时间以及服务端读取请求、调度的时间，服务时间是请求被服务处理的实际时间
 
 				d[i] = append(d[i], t)

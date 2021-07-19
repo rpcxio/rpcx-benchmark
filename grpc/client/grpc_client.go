@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/proto"
-	"github.com/juju/ratelimit"
 	benchmark "github.com/rpcxio/rpcx-benchmark"
 	"github.com/rpcxio/rpcx-benchmark/grpc/pb"
 	"github.com/smallnest/rpcx/log"
+	"go.uber.org/ratelimit"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
