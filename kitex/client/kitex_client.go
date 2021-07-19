@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/cloudwego/kitex/client"
+	"github.com/cloudwego/kitex/pkg/connpool"
 	"github.com/gogo/protobuf/proto"
 	benchmark "github.com/rpcxio/rpcx-benchmark"
 	"github.com/rpcxio/rpcx-benchmark/kitex/pb"
@@ -65,7 +66,9 @@ func main() {
 	var clientIndex uint64
 	poolClients := make([]hello.Client, 0, *pool)
 	for i := 0; i < *pool; i++ {
-		c := hello.MustNewClient("echo", client.WithHostPorts(servers...))
+		c := hello.MustNewClient("echo",
+			client.WithHostPorts(servers...),
+			client.WithLongConnection(connpool.IdleConfig{MaxIdlePerAddress: 100, MaxIdleGlobal: 1000, MaxIdleTimeout: time.Minute}))
 		// warmup
 		for j := 0; j < 5; j++ {
 			c.Say(context.Background(), args)
