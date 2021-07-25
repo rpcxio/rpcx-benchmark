@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/proto"
-	benchmark "github.com/rpcxio/rpcx-benchmark"
 	"github.com/rpcxio/rpcx-benchmark/grpc/pb"
+	"github.com/rpcxio/rpcx-benchmark/stat"
 	"github.com/smallnest/rpcx/log"
 	"go.uber.org/ratelimit"
 	"golang.org/x/net/context"
@@ -121,7 +121,7 @@ func main() {
 	wg.Wait()
 
 	// 统计
-	benchmark.Stats(startTime, *total, d, trans, transOK)
+	stat.Stats(startTime, *total, d, trans, transOK)
 }
 
 func prepareArgs() *pb.BenchmarkMessage {

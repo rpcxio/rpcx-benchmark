@@ -8,7 +8,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	benchmark "github.com/rpcxio/rpcx-benchmark"
+	"github.com/rpcxio/rpcx-benchmark/stat"
 	"go.uber.org/ratelimit"
 
 	"github.com/lesismal/arpc"
@@ -139,5 +139,5 @@ func main() {
 	wg.Wait()
 
 	// 统计
-	benchmark.Stats(startTime, *total, d, trans, transOK)
+	stat.Stats(startTime, *total, d, trans, transOK)
 }
