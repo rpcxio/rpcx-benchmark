@@ -1,4 +1,4 @@
-module github.com/rpcxio/rpcx-benchmark
+module github.com/rpcxio/rpcx-benchmark/rpcx
 
 go 1.16
 
@@ -12,6 +12,7 @@ require (
 	github.com/mars9/codec v0.0.0-20160208102151-49676af5c6e0
 	github.com/montanaflynn/stats v0.6.3
 	github.com/peterbourgon/g2s v0.0.0-20170223122336-d4e7ad98afea // indirect
+	github.com/rpcxio/rpcx-benchmark v0.0.0-20210719130405-d22ffd4c0af7 // indirect
 	github.com/smallnest/rpcx v1.6.5-0.20210718063917-51011c6501d3
 	github.com/valyala/fastrand v1.0.0 // indirect
 	go.opencensus.io v0.22.3 // indirect

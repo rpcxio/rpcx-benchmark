@@ -8,8 +8,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	benchmark "github.com/rpcxio/rpcx-benchmark"
 	"github.com/rpcxio/rpcx-benchmark/proto"
+	"github.com/rpcxio/rpcx-benchmark/stat"
 	"github.com/smallnest/rpcx/client"
 	"github.com/smallnest/rpcx/log"
 	"github.com/smallnest/rpcx/protocol"
@@ -140,5 +140,5 @@ func main() {
 	wg.Wait()
 
 	// 统计
-	benchmark.Stats(startTime, *total, d, trans, transOK)
+	stat.Stats(startTime, *total, d, trans, transOK)
 }
