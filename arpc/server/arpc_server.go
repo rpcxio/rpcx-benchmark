@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/lesismal/arpc"
-	alog "github.com/lesismal/arpc/log"
 	"github.com/rpcxio/rpcx-benchmark/arpc/codec"
 	"github.com/rpcxio/rpcx-benchmark/proto"
 )
@@ -46,7 +45,8 @@ var (
 func main() {
 	flag.Parse()
 
-	alog.SetLogLevel(alog.LogLevelNone)
+	// alog.SetLogLevel(alog.LogLevelNone)
+
 	log.Println("async response:", *async)
 
 	go func() {

@@ -12,7 +12,6 @@ import (
 	"go.uber.org/ratelimit"
 
 	"github.com/lesismal/arpc"
-	alog "github.com/lesismal/arpc/log"
 	"github.com/rpcxio/rpcx-benchmark/arpc/codec"
 	"github.com/rpcxio/rpcx-benchmark/proto"
 	"github.com/smallnest/rpcx/log"
@@ -29,7 +28,7 @@ var (
 func main() {
 	flag.Parse()
 
-	alog.SetLogLevel(alog.LogLevelNone)
+	// alog.SetLogLevel(alog.LogLevelNone)
 
 	var rl ratelimit.Limiter
 	if *rate > 0 {
