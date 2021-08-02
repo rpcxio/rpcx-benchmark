@@ -431,6 +431,8 @@ github.com/smallnest/rpcx v1.6.5-0.20210718063917-51011c6501d3 h1:0191TEckd4i8TR
 github.com/smallnest/rpcx v1.6.5-0.20210718063917-51011c6501d3/go.mod h1:KL4sAwUz0sGPK9DSmB1oIqPhhq8Zze4NTgSYkBkjHZ0=
 github.com/smallnest/rpcx v1.6.5 h1:Bsbt+etymkbSAAWjfB9z7ZduKgnwbWJi238l8hySe50=
 github.com/smallnest/rpcx v1.6.5/go.mod h1:KL4sAwUz0sGPK9DSmB1oIqPhhq8Zze4NTgSYkBkjHZ0=
+github.com/smallnest/rpcx v1.6.6-0.20210802133958-9255e02aaa3f h1:NSbxzxTXcUp1IceJZbGW7aDs+uG84/7vHuvc/jHkLUg=
+github.com/smallnest/rpcx v1.6.6-0.20210802133958-9255e02aaa3f/go.mod h1:KL4sAwUz0sGPK9DSmB1oIqPhhq8Zze4NTgSYkBkjHZ0=
 github.com/soheilhy/cmux v0.1.4 h1:0HKaf1o97UwFjHH9o5XsHUOF+tqmdA7KEzXLpiyaw0E=
 github.com/soheilhy/cmux v0.1.4/go.mod h1:IM3LyeVVIOuxMH7sFAkER9+bJ4dT7Ms6E4xg4kGIyLM=
 github.com/soheilhy/cmux v0.1.5 h1:jjzc5WVemNEDTLwv9tlmemhC73tI08BNOIGwBOo10Js=

@@ -30,7 +30,7 @@ require (
 	github.com/rpcxio/rpcx-benchmark/stat v0.0.0-20210725150441-a81c6568c195
 	github.com/rs/cors v1.8.0 // indirect
 	github.com/smallnest/quick v0.0.0-20210406061658-4bf95e372fbd // indirect
-	github.com/smallnest/rpcx v1.6.5
+	github.com/smallnest/rpcx v1.6.6-0.20210802133958-9255e02aaa3f
 	github.com/soheilhy/cmux v0.1.5 // indirect
 	github.com/tjfoc/gmsm v1.4.1 // indirect
 	github.com/valyala/fastrand v1.0.0 // indirect
