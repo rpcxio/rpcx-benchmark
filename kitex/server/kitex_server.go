@@ -40,7 +40,11 @@ func main() {
 	ipAddr, portNum, _ := net.SplitHostPort(*host)
 	ip := net.ParseIP(ipAddr)
 	port, _ := strconv.Atoi(portNum)
-	svr := hello.NewServer(new(Hello), server.WithServiceAddr(&net.TCPAddr{IP: ip, Port: port}))
+	svr := hello.NewServer(
+		new(Hello),
+		server.WithServiceAddr(&net.TCPAddr{IP: ip, Port: port}),
+		server.WithMuxTransport(), // 开启多路复用
+	)
 	if err := svr.Run(); err != nil {
 		log.Fatalf("server stopped with error:", err)
 	} else {

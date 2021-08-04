@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/cloudwego/kitex/client"
-	"github.com/cloudwego/kitex/pkg/connpool"
 	"github.com/gogo/protobuf/proto"
 	"github.com/rpcxio/rpcx-benchmark/kitex/pb"
 	"github.com/rpcxio/rpcx-benchmark/kitex/pb/hello"
@@ -62,10 +61,11 @@ func main() {
 	// 每个goroutine的耗时记录
 	d := make([][]int64, n, n)
 
-	// kitex client本身就是pool对象，所以不再单独创建pool
+	// kitex client 使用内置多路复用连接池
 	client := hello.MustNewClient("echo",
 		client.WithHostPorts(servers...),
-		client.WithLongConnection(connpool.IdleConfig{MaxIdlePerAddress: *pool, MaxIdleGlobal: *pool, MaxIdleTimeout: time.Minute}))
+		client.WithMuxConnection(*pool),
+	)
 	// warmup
 	for j := 0; j < 5; j++ {
 		client.Say(context.Background(), args)
