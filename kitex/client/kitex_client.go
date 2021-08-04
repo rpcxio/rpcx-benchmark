@@ -67,9 +67,17 @@ func main() {
 		client.WithMuxConnection(*pool),
 	)
 	// warmup
-	for j := 0; j < 5; j++ {
-		client.Say(context.Background(), args)
+	var warmWg sync.WaitGroup
+	for i := 0; i < *pool; i++ {
+		warmWg.Add(1)
+		go func() {
+			defer warmWg.Done()
+			for j := 0; j < 5; j++ {
+				client.Say(context.Background(), args)
+			}
+		}()
 	}
+	warmWg.Wait()
 
 	// 栅栏，控制客户端同时开始测试
 	var startWg sync.WaitGroup
