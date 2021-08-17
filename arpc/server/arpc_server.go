@@ -55,6 +55,7 @@ func main() {
 
 	server := arpc.NewServer()
 	server.Codec = &codec.ProtoBuffer{}
+	server.Handler.EnablePool(true)
 	server.Handler.Handle("Hello.Say", new(Hello).Say, *async)
 	server.Run(*host)
 }

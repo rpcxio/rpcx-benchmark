@@ -29,6 +29,8 @@ var (
 func main() {
 	flag.Parse()
 
+	arpc.EnablePool(true)
+
 	alog.SetLevel(alog.LevelNone)
 
 	var rl ratelimit.Limiter
