@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"flag"
+	stdlog "log"
+	"os"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -11,7 +13,7 @@ import (
 	"github.com/rpcxio/rpcx-benchmark/proto"
 	"github.com/rpcxio/rpcx-benchmark/stat"
 	"github.com/smallnest/rpcx/client"
-	"github.com/smallnest/rpcx/log"
+	log "github.com/smallnest/rpcx/log"
 	"github.com/smallnest/rpcx/protocol"
 	"go.uber.org/ratelimit"
 )
@@ -26,6 +28,8 @@ var (
 
 func main() {
 	flag.Parse()
+
+	log.SetLogger(log.NewDefaultLogger(os.Stdout, "", stdlog.LstdFlags|stdlog.Lshortfile, log.LvInfo))
 
 	var rl ratelimit.Limiter
 	if *rate > 0 {
