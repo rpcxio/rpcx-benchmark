@@ -3,15 +3,15 @@ module github.com/rpcxio/rpcx-benchmark/rpcx
 go 1.18
 
 require (
-	github.com/pyroscope-io/client v0.3.0
 	github.com/rpcxio/rpcx-benchmark/proto v0.0.0-20210817084709-121eb691f5bb
 	github.com/rpcxio/rpcx-benchmark/stat v0.0.0-20210817084709-121eb691f5bb
-	github.com/smallnest/rpcx v1.7.5-0.20220710035853-0f372c4f24ba
+	github.com/smallnest/rpcx v1.7.5-0.20220710150635-5055993d6708
 	go.uber.org/ratelimit v0.2.0
 )
 
 require (
 	github.com/akutz/memconn v0.1.0 // indirect
+	github.com/alitto/pond v1.8.0 // indirect
 	github.com/andres-erbsen/clock v0.0.0-20160526145045-9e14626cd129 // indirect
 	github.com/apache/thrift v0.16.0 // indirect
 	github.com/armon/go-metrics v0.4.0 // indirect
@@ -93,5 +93,3 @@ require (
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 )
-
-replace github.com/apache/thrift => github.com/apache/thrift v0.16.0

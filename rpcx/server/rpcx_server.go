@@ -33,6 +33,7 @@ var (
 	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 	delay      = flag.Duration("delay", 0, "delay to mock business processing")
 	debugAddr  = flag.String("d", "127.0.0.1:9981", "server ip and port")
+	usePool    = flag.Bool("p", false, "use pool or not")
 )
 
 func main() {
@@ -46,7 +47,15 @@ func main() {
 		log.Println(http.ListenAndServe(*debugAddr, nil))
 	}()
 
-	server := server.NewServer()
-	server.RegisterName("Hello", new(Hello), "")
-	server.Serve("tcp", *host)
+	var rpcxserver *server.Server
+
+	if *usePool {
+		rpcxserver = server.NewServer(server.WithPool(100, 1000000))
+	} else {
+		rpcxserver = server.NewServer()
+	}
+	// server.AsyncWrite = true
+
+	rpcxserver.RegisterName("Hello", new(Hello), "")
+	rpcxserver.Serve("tcp", *host)
 }
