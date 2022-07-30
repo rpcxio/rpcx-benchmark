@@ -250,8 +250,12 @@ github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0/go.mod h1:bCqn
 github.com/rpcxio/libkv v0.5.1-0.20210420120011-1fceaedca8a5/go.mod h1:zHGgtLr3cFhGtbalum0BrMPOjhFZFJXCKiws/25ewls=
 github.com/rpcxio/rpcx-benchmark/proto v0.0.0-20210817084709-121eb691f5bb h1:2WVUsCzjTOK5AHM3tTmNB+JGrjDn8a0Rja042FReTOg=
 github.com/rpcxio/rpcx-benchmark/proto v0.0.0-20210817084709-121eb691f5bb/go.mod h1:jMs/9yIfAWkRtkketF9FF/ozCNZDkj+Ax77AAwI2yFs=
+github.com/rpcxio/rpcx-benchmark/proto v0.0.0-20220710151605-01c6082298c1 h1:oLUS1zw0OLQMyZN9D04nb7Yv9NXoCXCcJxroIcEkDik=
+github.com/rpcxio/rpcx-benchmark/proto v0.0.0-20220710151605-01c6082298c1/go.mod h1:jMs/9yIfAWkRtkketF9FF/ozCNZDkj+Ax77AAwI2yFs=
 github.com/rpcxio/rpcx-benchmark/stat v0.0.0-20210817084709-121eb691f5bb h1:juFDoKYmyf45bqwortGzpus0fpyEPg3FoqN/znqSW4s=
 github.com/rpcxio/rpcx-benchmark/stat v0.0.0-20210817084709-121eb691f5bb/go.mod h1:32f+9tSH8bNuevDaa5azuQlB1PBf6hMEi1XKlf/+qxc=
+github.com/rpcxio/rpcx-benchmark/stat v0.0.0-20220730084343-905328fa1a4b h1:qX7CpQjmQ3lAv3jdKG5ytdvzJ699fQNHI+4BHpn5LWA=
+github.com/rpcxio/rpcx-benchmark/stat v0.0.0-20220730084343-905328fa1a4b/go.mod h1:32f+9tSH8bNuevDaa5azuQlB1PBf6hMEi1XKlf/+qxc=
 github.com/rs/cors v1.7.0/go.mod h1:gFx+x8UowdsKA9AchylcLynDq+nNFfI8FkUZdN/jGCU=
 github.com/rubyist/circuitbreaker v2.2.1+incompatible/go.mod h1:Ycs3JgJADPuzJDwffe12k6BZT8hxVi6lFK+gWYJLN4A=
 github.com/russross/blackfriday v1.5.2/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
@@ -287,6 +291,8 @@ github.com/sirupsen/logrus v1.4.2/go.mod h1:tLMulIdttU9McNUspp0xgXVQah82FyeX6Mwd
 github.com/smallnest/quick v0.0.0-20200505103731-c8c83f9c76d3/go.mod h1:pCMr9YKzcruQNKA1483At0JJkkB2oTiw1wSXCcXgDCI=
 github.com/smallnest/rpcx v1.6.4/go.mod h1:d1qxk7MoRETCA2fteORZUToX5PTz9NoNWiKPqMD0OaI=
 github.com/smallnest/rpcx v1.7.5-0.20220710035853-0f372c4f24ba h1:5t5P4O/GidyI4ejxjA1ZkDCXW4sLTfgiZEsQGYsmlUk=
+github.com/smallnest/rpcx v1.7.8 h1:e3fcmKbd8EmZp75F1AoR6Xd3z0MuX99gfcmCGaTzd+k=
+github.com/smallnest/rpcx v1.7.8/go.mod h1:WIcsH9UpSg/MPiKD7Atj48wBatFJXjnbJhXbwhuItlQ=
 github.com/soheilhy/cmux v0.1.4/go.mod h1:IM3LyeVVIOuxMH7sFAkER9+bJ4dT7Ms6E4xg4kGIyLM=
 github.com/sourcegraph/annotate v0.0.0-20160123013949-f4cad6c6324d/go.mod h1:UdhH50NIW0fCiwBSr0co2m7BnFLdv4fQTgdqdJTHFeE=
 github.com/sourcegraph/syntaxhighlight v0.0.0-20170531221838-bd320f5d308e/go.mod h1:HuIsMU8RRBOtsCgI77wP899iHVBQpCmg4ErYMZB+2IA=
@@ -412,6 +418,8 @@ golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20210927094055-39ccf1dd6fa6/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220708085239-5a0f0661e09d h1:/m5NbqQelATgoSPVC2Z23sR4kVNokFwDDyWh/3rGY+I=
 golang.org/x/sys v0.0.0-20220708085239-5a0f0661e09d/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 h1:WIoqL4EROvwiPdUtaip4VcDdpZ4kha7wBWZrbVKCIZg=
+golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/text v0.0.0-20170915032832-14c0d48ead0c/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.1-0.20180807135948-17ff2d5776d2/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
