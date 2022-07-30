@@ -40,7 +40,7 @@ func main() {
 
 	rlog.SetDummyLogger()
 
-	rpcxserver := server.NewServer()
+	rpcxserver := server.NewServer(server.WithPool(100, 1000000))
 	// rpcxserver.AsyncWrite = true
 
 	rpcxserver.AddHandler("Hello", "Say", hello)
