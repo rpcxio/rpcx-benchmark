@@ -3,9 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"log"
-	"net/http"
-	_ "net/http/pprof"
 	"runtime"
 	"time"
 
@@ -29,32 +26,17 @@ func (t *Hello) Say(ctx context.Context, args *proto.BenchmarkMessage, reply *pr
 }
 
 var (
-	host       = flag.String("s", "127.0.0.1:8972", "listened ip and port")
-	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
-	delay      = flag.Duration("delay", 0, "delay to mock business processing")
-	debugAddr  = flag.String("d", "127.0.0.1:9981", "server ip and port")
-	usePool    = flag.Bool("p", false, "use pool or not")
+	host  = flag.String("s", "127.0.0.1:8972", "listened ip and port")
+	delay = flag.Duration("delay", 0, "delay to mock business processing by sleep")
 )
 
 func main() {
 	flag.Parse()
 
-	server.UsePool = true
-
 	rlog.SetDummyLogger()
 
-	go func() {
-		log.Println(http.ListenAndServe(*debugAddr, nil))
-	}()
-
-	var rpcxserver *server.Server
-
-	if *usePool {
-		rpcxserver = server.NewServer(server.WithPool(100, 1000000))
-	} else {
-		rpcxserver = server.NewServer()
-	}
-	// server.AsyncWrite = true
+	rpcxserver := server.NewServer()
+	rpcxserver.AsyncWrite = true
 
 	rpcxserver.RegisterName("Hello", new(Hello), "")
 	rpcxserver.Serve("tcp", *host)
