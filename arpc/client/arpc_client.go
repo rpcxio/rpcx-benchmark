@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"flag"
+	stdlog "log"
 	"net"
+	"os"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -28,6 +30,8 @@ var (
 
 func main() {
 	flag.Parse()
+
+	log.SetLogger(log.NewDefaultLogger(os.Stdout, "", stdlog.LstdFlags|stdlog.Lshortfile, log.LvInfo))
 
 	arpc.EnablePool(true)
 

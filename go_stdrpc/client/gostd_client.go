@@ -2,9 +2,10 @@ package main
 
 import (
 	"flag"
+	stdlog "log"
 	"net"
-	_ "net/http/pprof"
 	"net/rpc"
+	"os"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -26,6 +27,8 @@ var (
 
 func main() {
 	flag.Parse()
+
+	log.SetLogger(log.NewDefaultLogger(os.Stdout, "", stdlog.LstdFlags|stdlog.Lshortfile, log.LvInfo))
 
 	var rl ratelimit.Limiter
 	if *rate > 0 {

@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	stdlog "log"
+	"os"
 	"reflect"
 	"strings"
 	"sync"
@@ -28,6 +30,8 @@ var (
 
 func main() {
 	flag.Parse()
+
+	log.SetLogger(log.NewDefaultLogger(os.Stdout, "", stdlog.LstdFlags|stdlog.Lshortfile, log.LvInfo))
 
 	var rl ratelimit.Limiter
 	if *rate > 0 {
@@ -95,6 +99,9 @@ func main() {
 		d = append(d, dt)
 
 		go func(i int) {
+			startWg.Done()
+			startWg.Wait()
+
 			for j := 0; j < m; j++ {
 				// 限流，这里不把限流的时间计算到等待耗时中
 				if rl != nil {
@@ -115,12 +122,12 @@ func main() {
 				atomic.AddUint64(&trans, 1)
 				wg.Done()
 			}
+
 		}(i)
 
 	}
 
 	wg.Wait()
-
 	// 统计
 	stat.Stats(startTime, *total, d, trans, transOK)
 }
