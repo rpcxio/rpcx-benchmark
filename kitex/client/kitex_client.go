@@ -12,9 +12,9 @@ import (
 
 	"github.com/cloudwego/kitex/client"
 	"github.com/gogo/protobuf/proto"
-	"github.com/rpcxio/rpcx-benchmark/kitex/pb"
 	"github.com/rpcxio/rpcx-benchmark/kitex/pb/hello"
-	stat "github.com/rpcxio/rpcx-benchmark/stat"
+	pb "github.com/rpcxio/rpcx-benchmark/proto"
+	"github.com/rpcxio/rpcx-benchmark/stat"
 	"github.com/smallnest/rpcx/log"
 	"go.uber.org/ratelimit"
 	"golang.org/x/net/context"
@@ -24,7 +24,7 @@ var (
 	concurrency = flag.Int("c", 1, "concurrency")
 	total       = flag.Int("n", 10000, "total requests for all clients")
 	host        = flag.String("s", "127.0.0.1:8972", "server ip and port")
-	pool        = flag.Int("pool", 10, " shared kitex clients")
+	pool        = flag.Int("pool", 1, " shared kitex clients")
 	rate        = flag.Int("r", 0, "throughputs")
 )
 
@@ -46,6 +46,9 @@ func main() {
 
 	servers := strings.Split(*host, ",")
 	log.Infof("Servers: %+v\n\n", *host)
+	if *pool > 1 {
+		log.Warnf("Notice: Kitex doesn't need the 'pool' param, not set is suggested")
+	}
 
 	args := prepareArgs()
 
@@ -115,7 +118,7 @@ func main() {
 
 				d[i] = append(d[i], t)
 
-				if err == nil && reply.Field1 != nil && *reply.Field1 == "OK" {
+				if err == nil && reply.Field1 == "OK" {
 					atomic.AddUint64(&transOK, 1)
 				}
 
