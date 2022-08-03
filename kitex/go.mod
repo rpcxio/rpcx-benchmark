@@ -5,7 +5,8 @@ go 1.18
 require (
 	github.com/cloudwego/kitex v0.3.4
 	github.com/gogo/protobuf v1.3.2
-	github.com/rpcxio/rpcx-benchmark/stat v0.0.0-20220710151605-01c6082298c1
+	github.com/rpcxio/rpcx-benchmark/proto v0.0.0-20220730153134-292b05d6ec48
+	github.com/rpcxio/rpcx-benchmark/stat v0.0.0-20220730084343-905328fa1a4b
 	github.com/smallnest/rpcx v1.7.8
 	go.uber.org/ratelimit v0.2.0
 	golang.org/x/net v0.0.0-20220728211354-c7608f3a8462
@@ -22,7 +23,6 @@ require (
 	github.com/cloudwego/netpoll v0.2.5 // indirect
 	github.com/cloudwego/thriftgo v0.1.7 // indirect
 	github.com/fatih/color v1.13.0 // indirect
-	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
@@ -42,3 +42,5 @@ require (
 )
 
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
+
+replace github.com/rpcxio/rpcx-benchmark/proto => ../proto

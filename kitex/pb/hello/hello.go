@@ -8,8 +8,8 @@ import (
 
 	"github.com/cloudwego/kitex/client"
 	kitex "github.com/cloudwego/kitex/pkg/serviceinfo"
-	"github.com/rpcxio/rpcx-benchmark/kitex/pb"
-	"google.golang.org/protobuf/proto"
+	pb "github.com/rpcxio/rpcx-benchmark/proto"
+	"github.com/gogo/protobuf/proto"
 )
 
 func serviceInfo() *kitex.ServiceInfo {
