@@ -39,7 +39,7 @@ var (
 	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 	delay      = flag.Duration("delay", 0, "delay to mock business processing")
 	debugAddr  = flag.String("d", "127.0.0.1:9981", "server ip and port")
-	async      = flag.Bool("a", false, "async response flag")
+	async      = flag.Bool("a", true, "async response flag")
 )
 
 func main() {
