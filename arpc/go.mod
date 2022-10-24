@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/gogo/protobuf v1.3.2
-	github.com/lesismal/arpc v1.2.9
+	github.com/lesismal/arpc v1.2.10
 	github.com/rpcxio/rpcx-benchmark/proto v0.0.0-20220710151605-01c6082298c1
 	github.com/rpcxio/rpcx-benchmark/stat v0.0.0-20220730084343-905328fa1a4b
 	github.com/smallnest/rpcx v1.7.8
