@@ -119,8 +119,8 @@ func main() {
 				}
 
 				atomic.AddUint64(&trans, 1)
+				wg.Done()
 			}
-			wg.Done()
 		}(i)
 
 	}
