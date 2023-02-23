@@ -20,7 +20,7 @@ require (
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/montanaflynn/stats v0.6.6 // indirect
 	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/text v0.3.8 // indirect
 	google.golang.org/genproto v0.0.0-20220728213248-dd149ef739b9 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 )
